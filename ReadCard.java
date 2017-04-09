@@ -93,16 +93,22 @@ public class ReadCard implements SerialPortEventListener {
     JLabel pinLabel = new JLabel("Voer uw pincode in");
     JButton hiddenButton = new JButton();
 
+    ImageIcon logo = new ImageIcon(getClass().getResource("Mesoslogo.jpg"));
+    JLabel logoLabel = new JLabel(logo);
+    JLabel logoLabel1 = new JLabel(logo);
+
     JLabel geldBevestiging = new JLabel(); //Tekst voor de hoeveelheid opnemen van de user
-    float saldo = 40; // saldo van de user
+    float saldo = 500; // saldo van de user
     int a; // variable voor input geld.
     int kansen;
     int secondsAll;
     int secondsPin;
+    boolean checkLimiet;
 
     timer timerCounter = new timer();
 
-    public class timer
+
+    private class timer
     {
         Timer timer = new Timer();
         TimerTask task = new TimerTask()
@@ -140,12 +146,13 @@ public class ReadCard implements SerialPortEventListener {
                 }
                 if(secondsAll >60)
                 {
-                    cardTest.show(mainPanel,"home");
+                    homeButton.doClick(100);
+                    secondsAll = 0;
                 }
             }
         };
 
-        public void start()
+        private void start()
         {
             timer.scheduleAtFixedRate(task, 1000, 1000);
         }
@@ -230,22 +237,26 @@ public class ReadCard implements SerialPortEventListener {
         initialize();
         JFrame mainFrame = new JFrame();
        // mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        mainFrame.setSize(new Dimension(1000,1000));
+        mainFrame.setSize(new Dimension(1600,900));
         mainFrame.setUndecorated(true);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setVisible(true);
         mainPanel.setLayout(cardTest); // in de main panel wordt de cardlayout gebruikt.
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 50;
         scan.setFont(typecharacters);
         scan.setPreferredSize(new Dimension(400, 100));
 
-        JLabel title = new JLabel("Welcome to Mesosbank(W.I.P.)");
+        JLabel title = new JLabel("Welcome to Mesosbank");
+
         title.setFont(typecharacters);
         titlePanel.add(title);
+        gbc.gridx = 0;
+        gbc.gridy = 50;
         buttonPanel.add(scan, gbc);
+        buttonPanel.add(logoLabel,gbc);
+
         JPanel homePag = new JPanel();
         homePag.setLayout(new BorderLayout());
         homePag.add(titlePanel, BorderLayout.NORTH);
@@ -254,18 +265,19 @@ public class ReadCard implements SerialPortEventListener {
 /////////////////// main menu
         JPanel pMenu = new JPanel();
         pMenu.setLayout(new BorderLayout());
-        JLabel titleMenu = new JLabel("Mesosbank mainmenu(W.I.P.)");
+        JLabel titleMenu = new JLabel("Mesosbank mainmenu");
+
         titleMenu.setFont(typecharacters);
         JLabel snelGeld = new JLabel("Opties voor snelopnemen");
-        JLabel blankLabel = new JLabel("Welkom in het hoofdmenu");
+        JLabel blankLabel = new JLabel(".");
         snelGeld.setFont(typecharacters);
+        blankLabel.setFont(typecharacters);
         tienEuro.setPreferredSize(new Dimension(200, 50));
         tienEuro.setFont(typecharacters);
         twintigEuro.setPreferredSize(new Dimension(200, 50));
         twintigEuro.setFont(typecharacters);
         vijftigEuro.setPreferredSize(new Dimension(200, 50));
         vijftigEuro.setFont(typecharacters);
-        blankLabel.setFont(typecharacters);
         saldoButton.setFont(typecharacters);
         anderButton.setFont(typecharacters);
         returnButton.setPreferredSize(new Dimension(200, 50));
@@ -278,6 +290,7 @@ public class ReadCard implements SerialPortEventListener {
         gbc.gridx = 0;
         gbc.gridy = 50;
         centerPanel.add(blankLabel,gbc);
+        centerPanel.add(logoLabel1,gbc);
         westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.PAGE_AXIS));
         westPanel.add(snelGeld);
         westPanel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -288,6 +301,7 @@ public class ReadCard implements SerialPortEventListener {
         westPanel.add(vijftigEuro);
 
         topPanel.add(titleMenu);
+
 
         eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.PAGE_AXIS));
         eastPanel.add(saldoButton);
@@ -351,6 +365,8 @@ public class ReadCard implements SerialPortEventListener {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "home");
                 pagina = "home";
+                blankLabel.setText(".");
+                blankLabel.setForeground(Color.BLACK);
                 anderField.setText("");
                 pinField.setText("");
             }
@@ -361,6 +377,8 @@ public class ReadCard implements SerialPortEventListener {
                 cardTest.show(mainPanel, "home");
                 anderField.setText("");
                 pinField.setText("");
+                blankLabel.setText(".");
+                blankLabel.setForeground(Color.BLACK);
                 pagina = "home";
             }
         });
@@ -369,6 +387,8 @@ public class ReadCard implements SerialPortEventListener {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "saldoPage");
                 pagina = "saldoPage";
+                blankLabel.setText(".");
+                blankLabel.setForeground(Color.BLACK);
             }
         });
 
@@ -376,6 +396,8 @@ public class ReadCard implements SerialPortEventListener {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "anderPage");
                 pagina = "anderPage";
+                blankLabel.setText(".");
+                blankLabel.setForeground(Color.BLACK);
                 anderField.setText("");
                 pinField.setText("");
             }
@@ -387,12 +409,13 @@ public class ReadCard implements SerialPortEventListener {
                 {
                     System.out.println("Werkt 10 euro");
                     blankLabel.setForeground(Color.red);
-                    blankLabel.setText("Ovoldoende saldo.");
+                    blankLabel.setText("Onvoldoende saldo.");
                 }
-                else if(a<saldo) {
+                else if(a<saldo || a == saldo) {
                     cardTest.show(mainPanel, "bevestigPage");
+                    checkLimiet = true;
                     geldBevestiging.setText("Wilt u " + a + " euro opnemen?");
-                   blankLabel.setText("Welkom in het hoofdmenu");
+                    blankLabel.setText(".");
                     blankLabel.setForeground(Color.BLACK);
                     pagina = "bevestigPage";
                 }
@@ -406,12 +429,13 @@ public class ReadCard implements SerialPortEventListener {
                 {
                     System.out.println("Werkt20 euro");
                     blankLabel.setForeground(Color.red);
-                    blankLabel.setText("Ovoldoende saldo.");
+                    blankLabel.setText("Onvoldoende saldo.");
                 }
-                else if(a<saldo) {
+                else if(a<saldo|| a == saldo) {
                     cardTest.show(mainPanel, "bevestigPage");
+                    checkLimiet = true;
                     geldBevestiging.setText("Wilt u " + a + " euro opnemen?");
-                    blankLabel.setText("Welkom in het hoofdmenu");
+                    blankLabel.setText(".");
                     blankLabel.setForeground(Color.BLACK);
                     pagina = "bevestigPage";
                 }
@@ -424,12 +448,13 @@ public class ReadCard implements SerialPortEventListener {
                 {
                     System.out.println("Werkt 50 euro");
                     blankLabel.setForeground(Color.red);
-                    blankLabel.setText("Ovoldoende saldo.");
+                    blankLabel.setText("Onvoldoende saldo.");
                 }
-                else if(a<saldo) {
+                else if(a<saldo|| a == saldo) {
                     cardTest.show(mainPanel, "bevestigPage");
+                    checkLimiet = true;
                     geldBevestiging.setText("Wilt u " + a + " euro opnemen?");
-                    blankLabel.setText("Welkom in het hoofdmenu");
+                    blankLabel.setText(".");
                     blankLabel.setForeground(Color.BLACK);
                     pagina = "bevestigPage";
                 }
@@ -536,6 +561,7 @@ public class ReadCard implements SerialPortEventListener {
                         System.out.println("Toegang ");
                         kansen = 0;
                         pinLabel.setText("Voer uw pincode in");
+                        anderField.setText("0");
                     }
                     else if(checkPassword() == true && kansen == 0)
                     {
@@ -580,7 +606,7 @@ public class ReadCard implements SerialPortEventListener {
     private JPanel bonPrint() {
         JPanel bonPage = new JPanel();
         bonPage.setLayout(new BorderLayout());
-        JLabel titleBon = new JLabel("Mesosbank(W.I.P.)");
+        JLabel titleBon = new JLabel("Mesosbank bonnenprinter");
         JLabel vraagBon = new JLabel("Wilt u een bon?");
         GridBagConstraints gbc = new GridBagConstraints();
         printTop.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -626,7 +652,7 @@ public class ReadCard implements SerialPortEventListener {
     private JPanel bevestiging() {
         JPanel bevestigPage = new JPanel();
         bevestigPage.setLayout(new BorderLayout());
-        JLabel titleBevestig = new JLabel("Mesosbank bevestiging menu(W.I.P.)");
+        JLabel titleBevestig = new JLabel("Mesosbank bevestiging");
         GridBagConstraints gbc = new GridBagConstraints();
         titleBevestig.setFont(typecharacters);
         jaBevestig.setFont(typecharacters);
@@ -656,6 +682,7 @@ public class ReadCard implements SerialPortEventListener {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "home");
                 pagina = "home";
+                geldBevestiging.setForeground(Color.black);
             }
         });
 
@@ -663,13 +690,25 @@ public class ReadCard implements SerialPortEventListener {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "menu");
                 pagina = "menu";
+                geldBevestiging.setForeground(Color.black);
             }
         });
 
         jaBevestig.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                   cardTest.show(mainPanel, "bonPage");
-                   pagina = "bonPage";
+
+                if(checkLimiet() == false)
+                {
+                    cardTest.show(mainPanel, "bonPage");
+                    pagina = "bonPage";
+                    System.out.println("Geen limiet");
+                }
+                else if(checkLimiet() == true)
+                {
+                    geldBevestiging.setText("Limiet bereik!");
+                    geldBevestiging.setForeground(Color.red);
+                    System.out.println("limiet bereikt!");
+                }
             }
         });
         return bevestigPage;
@@ -677,7 +716,7 @@ public class ReadCard implements SerialPortEventListener {
 
     private JPanel andereBedrag() {
         JPanel anderPage = new JPanel();
-        JLabel titleAnder = new JLabel("Mesosbank ander bedrag menu(W.I.P.)");
+        JLabel titleAnder = new JLabel("Mesosbank custom bedrag");
         JLabel textAnder = new JLabel("Voer uw bedrag in:");
         JLabel textVoorbeeld = new JLabel("Geen bedragen met eenheden(1, 12, 23 etc.)");
         textAnder.setFont(typecharacters);
@@ -751,7 +790,8 @@ public class ReadCard implements SerialPortEventListener {
         exitAnder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "home");
-                anderField.setText("");
+                anderField.setText("0");
+                a = 0;
                 pagina = "home";
                 textVoorbeeld.setText("Geen bedragen met eenheden(1, 12, 23 etc.)");
                 textVoorbeeld.setForeground(Color.black);
@@ -761,6 +801,8 @@ public class ReadCard implements SerialPortEventListener {
         returnAnder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "menu");
+                anderField.setText("0");
+                a = 0;
                 pagina = "menu";
                 textVoorbeeld.setText("Geen bedragen met eenheden(1, 12, 23 etc.)");
                 textVoorbeeld.setForeground(Color.black);
@@ -771,7 +813,7 @@ public class ReadCard implements SerialPortEventListener {
 
     private JPanel saldoWeergave() {
         JPanel saldoPage = new JPanel();
-        JLabel titleSaldo = new JLabel("Mesosbank saldoweergave(W.I.P.)");
+        JLabel titleSaldo = new JLabel("Mesosbank saldoweergave");
         titleSaldo.setFont(typecharacters);
         GridBagConstraints gbc = new GridBagConstraints();
         JLabel huidigeSaldo = new JLabel("Uw huidige saldo is " + saldo + " euro");
@@ -849,6 +891,51 @@ public class ReadCard implements SerialPortEventListener {
 
     }
 
+    private boolean checkLimiet()
+    {
+        int ditLimiet = 500;
+        int bijHouGetal = 0;
+        int getal = Integer.parseInt(anderField.getText());
+
+        if(a>0)
+        {
+            bijHouGetal = bijHouGetal + a;
+            System.out.println(bijHouGetal);
+            if(bijHouGetal >ditLimiet)
+            {
+                System.out.println("binnen werkt limiet");
+                checkLimiet = true;
+                return checkLimiet;
+            }
+            else
+            {
+                System.out.println("buiten werkt");
+                checkLimiet = false;
+                return checkLimiet;
+            }
+        }
+        else if(getal>0) {
+            bijHouGetal = bijHouGetal + getal;
+            System.out.println(bijHouGetal);
+            if (bijHouGetal > ditLimiet) {
+                System.out.println("binnen werkt limiet bij getal");
+                checkLimiet = true;
+                return checkLimiet;
+            } else {
+                System.out.println("buiten werkt bij getal");
+                checkLimiet = false;
+                return checkLimiet;
+            }
+        }
+
+        else
+        {
+            checkLimiet = false;
+            return checkLimiet;
+        }
+
+    }
+
     private boolean checkPassword()
     {
         String pinPassword = new String(pinField.getPassword());
@@ -860,11 +947,11 @@ public class ReadCard implements SerialPortEventListener {
             return checkPassword;
         }
         else
-            {
-                System.out.println("Niet goed wachtwoord");
-                checkPassword = true;
-                return checkPassword;
-            }
+        {
+            System.out.println("Niet goed wachtwoord");
+            checkPassword = true;
+            return checkPassword;
+        }
     }
     ///////////////////// serialprinlnt
     public void serialEvent(SerialPortEvent spe) {

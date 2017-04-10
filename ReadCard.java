@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit;
 public class ReadCard implements SerialPortEventListener {
     private static CardLayout cardTest = new CardLayout();
 
-    // String pagina binden met elke panel als ze wisselen.
-    String pagina;
+
+    String pagina; //Elk panel binden aan een pagina
     //First panel
     JButton scan = new JButton("Scan uw kaart");
     JButton sluitprogramma = new JButton("Exit program");
@@ -98,12 +98,12 @@ public class ReadCard implements SerialPortEventListener {
     JLabel logoLabel1 = new JLabel(logo);
 
     JLabel geldBevestiging = new JLabel(); //Tekst voor de hoeveelheid opnemen van de user
-    float saldo = 500; // saldo van de user
+    float saldo = 40; // saldo van de user
     int a; // variable voor input geld.
-    int kansen;
-    int secondsAll;
-    int secondsPin;
-    boolean checkLimiet;
+    int kansen; //aantal pin kansen
+    int secondsAll; // timer voor elk panel
+    int secondsPin; // timer voor pinnen
+    boolean checkLimiet; //limiet voor saldo
 
     timer timerCounter = new timer();
 
@@ -144,7 +144,7 @@ public class ReadCard implements SerialPortEventListener {
                         }
                     }
                 }
-                if(secondsAll >60)
+                if(secondsAll >60 && pagina != "pin")
                 {
                     homeButton.doClick(100);
                     secondsAll = 0;
@@ -236,19 +236,19 @@ public class ReadCard implements SerialPortEventListener {
         anderField.setEditable(false);
         initialize();
         JFrame mainFrame = new JFrame();
-       // mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        mainFrame.setSize(new Dimension(1600,900));
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //mainFrame.setSize(new Dimension(1000,600));
         mainFrame.setUndecorated(true);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setLocationRelativeTo(null);
-        mainFrame.setVisible(true);
+        mainFrame.setLocationRelativeTo(null); //De frame in de midden van de scherm plaatsen
+        mainFrame.setVisible(true); // frame zichtbaar maken
         mainPanel.setLayout(cardTest); // in de main panel wordt de cardlayout gebruikt.
 
         GridBagConstraints gbc = new GridBagConstraints();
         scan.setFont(typecharacters);
         scan.setPreferredSize(new Dimension(400, 100));
 
-        JLabel title = new JLabel("Welcome to Mesosbank");
+        JLabel title = new JLabel("Welkom bij Mesosbank");
 
         title.setFont(typecharacters);
         titlePanel.add(title);
@@ -317,7 +317,7 @@ public class ReadCard implements SerialPortEventListener {
         pMenu.add(eastPanel, BorderLayout.EAST);
         pMenu.add(bottomPanel, BorderLayout.SOUTH);
 ///////////saldo
-        JPanel saldoPanel = new JPanel();
+        JPanel saldoPanel = new JPanel(); //panel met methode binden
         saldoPanel = saldoWeergave();
 //////// ander
         JPanel anderePage = new JPanel();
@@ -335,10 +335,10 @@ public class ReadCard implements SerialPortEventListener {
         JPanel okPage = new JPanel();
         okPage = okPanel();
 ///
-        mainPanel.add(homePag, "home");
-        mainPanel.add(okPage, "ok");// panel, benaming van de main panel.
+        mainPanel.add(homePag, "home");// mainpanel linken aan een ander panel en de benaming van dat panel
+        mainPanel.add(okPage, "ok");
         mainPanel.add(pinPage, "pin");
-        mainPanel.add(pMenu, "menu"); // Panel, de benaming van de panel.
+        mainPanel.add(pMenu, "menu");
         mainPanel.add(saldoPanel, "saldoPage");
         mainPanel.add(anderePage, "anderPage");
         mainPanel.add(bevestigPag, "bevestigPage");
@@ -382,7 +382,7 @@ public class ReadCard implements SerialPortEventListener {
                 pagina = "home";
             }
         });
-
+        //Jbutton gelinked aan saldo weergave
         saldoButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 cardTest.show(mainPanel, "saldoPage");
@@ -405,7 +405,7 @@ public class ReadCard implements SerialPortEventListener {
         tienEuro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
                 int a = 10;
-                if(a> saldo)
+                if(a> saldo) //Saldo controleren op genoeg saldo, als de gewenste bedrag is ingevoerd.
                 {
                     System.out.println("Werkt 10 euro");
                     blankLabel.setForeground(Color.red);
@@ -550,7 +550,7 @@ public class ReadCard implements SerialPortEventListener {
         pM.add(pinTop, BorderLayout.NORTH);
         pM.add(pinCenter);
 
-        /// Seventh panel pin
+        /// Seventh panel pin, controle voor pincode
         enter.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent ae) {
@@ -762,7 +762,7 @@ public class ReadCard implements SerialPortEventListener {
 
         enterAnder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                if(checkEental() == false)
+                if(checkEental() == false) //controle voor eenheden bij ander bedragen
                 {
                     textVoorbeeld.setForeground(Color.RED);
                     textVoorbeeld.setText("Geen bedragen met eenheden(1, 12, 23 etc.)");
@@ -953,7 +953,7 @@ public class ReadCard implements SerialPortEventListener {
             return checkPassword;
         }
     }
-    ///////////////////// serialprinlnt
+    ///////////////////// serialprinlnt + input van button een functie toewijzen.
     public void serialEvent(SerialPortEvent spe) {
         switch (spe.getEventType()) {
             case SerialPortEvent.BI:
@@ -978,12 +978,12 @@ public class ReadCard implements SerialPortEventListener {
                         sluitprogramma.doClick(400);}
                     else if(numBytes>nummer && pagina == "home"){scan.doClick(300); nummer =1; break;}
                     else if(inputLine.equals("A") && pagina == "home") {
-                        scan.doClick(300);}
+                        scan.doClick(400);}
                     // ok page
-                    else if(inputLine.equals("A") && pagina == "ok"){okButton.doClick(300);}
+                    else if(inputLine.equals("A") && pagina == "ok"){okButton.doClick(500);}
 
                     else if (inputLine.equals("A") && pagina == "ok") {
-                        okButton.doClick(100);
+                        okButton.doClick(400);
                     }
                     else if (inputLine.equals("D") && pagina == "ok") {
                         homeButton.doClick(400);
